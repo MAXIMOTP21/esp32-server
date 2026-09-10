@@ -18,65 +18,93 @@ let html = `
 <meta name="viewport"
 content="width=device-width, initial-scale=1">
 
-<title>Dashboard ESP32</title>
+<title>ESP32 Dashboard</title>
 
 <style>
 
 body{
-    font-family: Arial, sans-serif;
-    background:#f4f6f9;
-    margin:0;
+    background:#0f172a;
+    color:white;
+    font-family:Arial;
     padding:20px;
 }
 
 h1{
     text-align:center;
-    color:#333;
+}
+
+.estado{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.online{
+    color:#22c55e;
+    font-weight:bold;
+}
+
+.grid{
+    display:grid;
+    gap:15px;
 }
 
 .card{
-    background:white;
-    border-radius:12px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+    background:#1e293b;
     padding:15px;
-    margin-bottom:15px;
-}
-
-.fecha{
-    color:gray;
-    font-size:13px;
-}
-
-.valor{
-    font-size:18px;
-    margin-top:8px;
+    border-radius:15px;
+    box-shadow:0 0 10px rgba(0,0,0,0.3);
 }
 
 .temp{
-    color:#e74c3c;
+    color:#ef4444;
 }
 
 .hum{
-    color:#3498db;
+    color:#38bdf8;
 }
 
 .gas{
-    color:#27ae60;
+    color:#22c55e;
+}
+
+.fecha{
+    color:#94a3b8;
+    font-size:12px;
+}
+
+.valor{
+    font-size:22px;
+    margin-top:5px;
 }
 
 </style>
+
+<script>
+
+setTimeout(()=>{
+ location.reload();
+},5000);
+
+</script>
 
 </head>
 
 <body>
 
-<h1>📡 Dashboard ESP32</h1>
+<h1>📡 ESP32 Dashboard</h1>
 
+<div class="estado">
+ESP32:
+<span class="online">● ONLINE</span>
+</div>
+
+<div class="grid">
 `;
 
 historial.slice().reverse().forEach(d=>{
 
 html += `
+
 <div class="card">
 
 <div class="fecha">
@@ -96,30 +124,22 @@ ${new Date(d.fecha).toLocaleString()}
 </div>
 
 </div>
+
 `;
 
 });
 
 html += `
+
+</div>
+
 </body>
+
 </html>
+
 `;
 
 res.send(html);
-
-});
-
-// Test de funcionamiento
-app.get("/test", (req, res) => {
-    res.json({
-        estado: "online"
-    });
-});
-
-// Historial JSON
-app.get("/api/history",(req,res)=>{
-
-    res.json(historial);
 
 });
 
@@ -145,16 +165,23 @@ app.post("/api/data", (req, res) => {
     console.log("Gas:", gas);
 
     let led = false;
+let relay = false;
 
-    if (temperatura > 30) {
-        led = true;
-    }
+if(temperatura > 30)
+{
+   led = true;
+}
 
-    res.json({
-        status: "ok",
-        led: led,
-        relay: false,
-        sampling: 5000
+if(gas > 200)
+{
+   relay = true;
+}
+
+   res.json({
+    status: "ok",
+    led: led,
+    relay: relay,
+    sampling: 5000
     });
 });
 
