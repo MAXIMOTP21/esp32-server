@@ -8,24 +8,102 @@ app.use(express.json());
 app.get("/", (req,res)=>{
 
 let html = `
-<h1>Dashboard ESP32</h1>
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1">
+
+<title>Dashboard ESP32</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    margin:0;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    color:#333;
+}
+
+.card{
+    background:white;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+    padding:15px;
+    margin-bottom:15px;
+}
+
+.fecha{
+    color:gray;
+    font-size:13px;
+}
+
+.valor{
+    font-size:18px;
+    margin-top:8px;
+}
+
+.temp{
+    color:#e74c3c;
+}
+
+.hum{
+    color:#3498db;
+}
+
+.gas{
+    color:#27ae60;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>📡 Dashboard ESP32</h1>
+
 `;
 
-historial.forEach(d=>{
+historial.slice().reverse().forEach(d=>{
 
 html += `
-<p>
-${d.fecha}
-|
-Temp: ${d.temperatura}
-|
-Hum: ${d.humedad}
-|
-Gas: ${d.gas}
-</p>
+<div class="card">
+
+<div class="fecha">
+${new Date(d.fecha).toLocaleString()}
+</div>
+
+<div class="valor temp">
+🌡 Temperatura: ${d.temperatura} °C
+</div>
+
+<div class="valor hum">
+💧 Humedad: ${d.humedad} %
+</div>
+
+<div class="valor gas">
+🧪 Gas: ${d.gas}
+</div>
+
+</div>
 `;
 
 });
+
+html += `
+</body>
+</html>
+`;
 
 res.send(html);
 
