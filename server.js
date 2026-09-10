@@ -1,12 +1,34 @@
 const express = require("express");
-
+const historial = [];
 const app = express();
 
 app.use(express.json());
 
-// Página principal
-app.get("/", (req, res) => {
-    res.send("Servidor ESP32 funcionando");
+// Dashboard Web
+app.get("/", (req,res)=>{
+
+let html = `
+<h1>Dashboard ESP32</h1>
+`;
+
+historial.forEach(d=>{
+
+html += `
+<p>
+${d.fecha}
+|
+Temp: ${d.temperatura}
+|
+Hum: ${d.humedad}
+|
+Gas: ${d.gas}
+</p>
+`;
+
+});
+
+res.send(html);
+
 });
 
 // Test de funcionamiento
@@ -16,9 +38,22 @@ app.get("/test", (req, res) => {
     });
 });
 
+// Historial JSON
+app.get("/api/history",(req,res)=>{
+
+    res.json(historial);
+
+});
+
 // Endpoint para recibir datos del ESP32
 app.post("/api/data", (req, res) => {
 
+    historial.push({
+    fecha: new Date(),
+    temperatura: req.body.temperature,
+    humedad: req.body.humidity,
+    gas: req.body.gas
+});
     console.log("Datos recibidos:");
 
     console.log(req.body);
