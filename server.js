@@ -23,7 +23,12 @@ app.post("/api/data", (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-
+app.get("/test", (req,res)=>{
+    res.json({
+        status:"online",
+        servidor:"funcionando"
+    });
+});
 app.listen(PORT, () => {
     console.log(`Servidor iniciado en puerto ${PORT}`);
 });
