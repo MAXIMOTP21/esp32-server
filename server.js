@@ -3,7 +3,14 @@ const historial = [];
 const app = express();
 let estadoLed = false;
 let estadoRelay = false;
-``
+const TEMP_MIN = 18;
+const TEMP_MAX = 26;
+
+const HUM_MIN = 50;
+const HUM_MAX = 75;
+
+const GAS_MAX = 200;
+
 app.use(express.json());
 
 // Dashboard Web
@@ -97,15 +104,15 @@ setTimeout(()=>{
 <h1>📡 ESP32 Dashboard</h1>
 <div class="card">
 
-<h2>⚙️ Límites de activación</h2>
+<div class="card">
 
-<p>🌡 Temperatura máxima: 30 °C</p>
+<h2>🎯 Valores ideales</h2>
+
+<p>🌡 Temperatura ideal: 18°C - 26°C</p>
+
+<p>💧 Humedad ideal: 50% - 75%</p>
 
 <p>🧪 Gas máximo: 200</p>
-
-<p>💡 LED: Se activa sobre 30 °C</p>
-
-<p>🔌 Relay: Se activa sobre 200 de gas</p>
 
 </div>
 <div class="card">
@@ -137,6 +144,72 @@ ${estadoRelay ? "🟢 ACTIVADO" : "⚪ APAGADO"}
 </div>
 <div class="grid">
 `;
+const ultimo = historial[historial.length - 1];
+
+if(ultimo){
+if(ultimo){
+
+const estadoTemp =
+(ultimo.temperatura >= TEMP_MIN &&
+ultimo.temperatura <= TEMP_MAX)
+?
+"🟢 Correcta"
+:
+"🔴 Fuera de rango";
+
+const estadoHum =
+(ultimo.humedad >= HUM_MIN &&
+ultimo.humedad <= HUM_MAX)
+?
+"🟢 Correcta"
+:
+"🔴 Fuera de rango";
+
+html += `
+
+<div class="card">
+
+<h2>📟 Lectura Actual</h2>
+
+<p>
+🌡 Temperatura:
+${ultimo.temperatura} °C
+${estadoTemp}
+</p>
+
+<p>
+💧 Humedad:
+${ultimo.humedad} %
+${estadoHum}
+</p>
+
+<p>
+🧪 Gas:
+${ultimo.gas}
+</p>
+
+</div>
+
+`;
+
+}
+html += `
+
+<div class="card">
+
+<h2>📟 Lectura Actual</h2>
+
+<p>🌡 Temperatura: ${ultimo.temperatura} °C</p>
+
+<p>💧 Humedad: ${ultimo.humedad} %</p>
+
+<p>🧪 Gas: ${ultimo.gas}</p>
+
+</div>
+
+`;
+
+}
 
 historial.slice().reverse().forEach(d=>{
 
@@ -173,7 +246,9 @@ html += `
 <script>
 
 const labels = [
-${historial.map((d,i)=>`"${i+1}"`).join(",")}
+${historial.map(
+d => `"${new Date(d.fecha).toLocaleTimeString()}"`
+).join(",")}
 ];
 
 const temperaturas = [
@@ -186,9 +261,31 @@ document.getElementById("tempChart"),
 type:"line",
 data:{
 labels:labels,
-datasets:[{
-label:"Temperatura °C",
+datasets:[
+
+{
+label:'Temperatura',
 data:temperaturas,
+borderColor:'#ef4444',
+backgroundColor:'rgba(239,68,68,0.2)',
+fill:true
+},
+
+{
+label:'Mínimo Ideal',
+data:Array(temperaturas.length).fill(18),
+borderColor:'#22c55e',
+fill:false
+},
+
+{
+label:'Máximo Ideal',
+data:Array(temperaturas.length).fill(26),
+borderColor:'#facc15',
+fill:false
+}
+
+]
 borderColor:"#ef4444",
 backgroundColor:"rgba(239,68,68,0.2)",
 fill:true
