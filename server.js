@@ -22,81 +22,145 @@ https://cdn.jsdelivr.net/npm/chart.jsscript>
 
 <title>ESP32 Dashboard</title>
 
+
 <style>
 
+
+
 body{
-    background:#0f172a;
-    color:white;
-    font-family:Arial;
-    padding:20px;
+
+&#x20;   background:#0f172a;
+
+&#x20;   color:white;
+
+&#x20;   font-family:Arial;
+
+&#x20;   padding:20px;
+
 }
+
+
 
 h1{
-    text-align:center;
+
+&#x20;   text-align:center;
+
 }
+
+
 
 .estado{
-    text-align:center;
-    margin-bottom:20px;
+
+&#x20;   text-align:center;
+
+&#x20;   margin-bottom:20px;
+
 }
+
+
 
 .online{
-    color:#22c55e;
-    font-weight:bold;
+
+&#x20;   color:#22c55e;
+
+&#x20;   font-weight:bold;
+
 }
+
+
 
 .grid{
-    display:grid;
-    gap:15px;
+
+&#x20;   display:grid;
+
+&#x20;   gap:15px;
+
 }
+
+
 
 .card{
-    background:#1e293b;
-    padding:15px;
-    border-radius:15px;
-    box-shadow:0 0 10px rgba(0,0,0,0.3);
+
+&#x20;   background:#1e293b;
+
+&#x20;   padding:15px;
+
+&#x20;   border-radius:15px;
+
+&#x20;   box-shadow:0 0 10px rgba(0,0,0,0.3);
+
 }
+
+
 
 .temp{
-    color:#ef4444;
+
+&#x20;   color:#ef4444;
+
 }
+
+
 
 .hum{
-    color:#38bdf8;
+
+&#x20;   color:#38bdf8;
+
 }
+
+
 
 .gas{
-    color:#22c55e;
+
+&#x20;   color:#22c55e;
+
 }
+
+
 
 .fecha{
-    color:#94a3b8;
-    font-size:12px;
+
+&#x20;   color:#94a3b8;
+
+&#x20;   font-size:12px;
+
 }
+
+
 
 .valor{
-    font-size:22px;
-    margin-top:5px;
+
+&#x20;   font-size:22px;
+
+&#x20;   margin-top:5px;
+
 }
 
-</style>
+
+
 
 <script>
 
+
+
 setTimeout(()=>{
- location.reload();
+
+&#x20;location.reload();
+
 },5000);
 
-</script>
+
+
 
 </head>
 
 <body>
 
 <h1>📡 ESP32 Dashboard</h1>
+
 <div class="card">
     <canvas id="tempChart"></canvas>
 </div>
+
 <div class="estado">
 ESP32:
 <span class="online">● ONLINE</span>
@@ -106,6 +170,32 @@ ESP32:
 `;
 
 historial.slice().reverse().forEach(d=>{
+
+html += `
+
+<div class="card">
+
+<div class="fecha">
+${new Date(d.fecha).toLocaleString()}
+</div>
+
+<div class="valor temp">
+🌡 Temperatura: ${d.temperatura} °C
+</div>
+
+<div class="valor hum">
+💧 Humedad: ${d.humedad} %
+</div>
+
+<div class="valor gas">
+🧪 Gas: ${d.gas}
+</div>
+
+</div>
+
+`;
+
+});
 
 html += `
 
@@ -144,7 +234,12 @@ document.getElementById('tempChart'),
 </body>
 </html>
 
+
 `;
+
+res.send(html);
+
+});
 
 // Endpoint para recibir datos del ESP32
 app.post("/api/data", (req, res) => {
