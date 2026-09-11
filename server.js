@@ -1,7 +1,9 @@
 const express = require("express");
 const historial = [];
 const app = express();
-
+let estadoLed = false;
+let estadoRelay = false;
+``
 app.use(express.json());
 
 // Dashboard Web
@@ -20,8 +22,9 @@ content="width=device-width, initial-scale=1">
 
 <title>ESP32 Dashboard</title>
 
-<style>
+https://cdn.jsdelivr.net/npm/chart.jsscript>
 
+<style>
 body{
     background:#0f172a;
     color:white;
@@ -92,12 +95,46 @@ setTimeout(()=>{
 <body>
 
 <h1>📡 ESP32 Dashboard</h1>
+<div class="card">
+
+<h2>⚙️ Límites de activación</h2>
+
+<p>🌡 Temperatura máxima: 30 °C</p>
+
+<p>🧪 Gas máximo: 200</p>
+
+<p>💡 LED: Se activa sobre 30 °C</p>
+
+<p>🔌 Relay: Se activa sobre 200 de gas</p>
+
+</div>
+<div class="card">
+
+<h2>📈 Temperatura</h2>
+
+<canvas id="tempChart"></canvas>
+
+</div>
 
 <div class="estado">
 ESP32:
 <span class="online">● ONLINE</span>
 </div>
+<div class="card">
 
+<h2>🚨 Estado Actual</h2>
+
+<p>
+LED:
+${estadoLed ? "🟢 ACTIVADO" : "⚪ APAGADO"}
+</p>
+
+<p>
+Relay:
+${estadoRelay ? "🟢 ACTIVADO" : "⚪ APAGADO"}
+</p>
+
+</div>
 <div class="grid">
 `;
 
@@ -133,6 +170,38 @@ html += `
 
 </div>
 
+<script>
+
+const labels = [
+${historial.map((d,i)=>`"${i+1}"`).join(",")}
+];
+
+const temperaturas = [
+${historial.map(d=>d.temperatura).join(",")}
+];
+
+new Chart(
+document.getElementById("tempChart"),
+{
+type:"line",
+data:{
+labels:labels,
+datasets:[{
+label:"Temperatura °C",
+data:temperaturas,
+borderColor:"#ef4444",
+backgroundColor:"rgba(239,68,68,0.2)",
+fill:true
+}]
+},
+options:{
+responsive:true
+}
+}
+);
+
+</script>
+
 </body>
 
 </html>
@@ -166,7 +235,8 @@ app.post("/api/data", (req, res) => {
 
     let led = false;
 let relay = false;
-
+estadoLed = led;
+estadoRelay = relay;
 if(temperatura > 30)
 {
    led = true;
@@ -174,9 +244,11 @@ if(temperatura > 30)
 
 if(gas > 200)
 {
-   relay = true;
+ 
+    relay = true;
 }
-
+estadoLed = led;
+estadoRelay = relay;
    res.json({
     status: "ok",
     led: led,
