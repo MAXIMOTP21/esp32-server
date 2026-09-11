@@ -18,6 +18,8 @@ let html = `
 <meta name="viewport"
 content="width=device-width, initial-scale=1">
 
+https://cdn.jsdelivr.net/npm/chart.jsscript>
+
 <title>ESP32 Dashboard</title>
 
 <style>
@@ -92,7 +94,9 @@ setTimeout(()=>{
 <body>
 
 <h1>📡 ESP32 Dashboard</h1>
-
+<div class="card">
+    <canvas id="tempChart"></canvas>
+</div>
 <div class="estado">
 ESP32:
 <span class="online">● ONLINE</span>
@@ -105,43 +109,42 @@ historial.slice().reverse().forEach(d=>{
 
 html += `
 
-<div class="card">
+<script>
 
-<div class="fecha">
-${new Date(d.fecha).toLocaleString()}
-</div>
+const labels = [
+${historial.map((d,i)=>`"${i+1}"`).join(",")}
+];
 
-<div class="valor temp">
-🌡 Temperatura: ${d.temperatura} °C
-</div>
+const temperaturas = [
+${historial.map(d=>d.temperatura).join(",")}
+];
 
-<div class="valor hum">
-💧 Humedad: ${d.humedad} %
-</div>
+new Chart(
+document.getElementById('tempChart'),
+{
+    type:'line',
+    data:{
+        labels:labels,
+        datasets:[{
+            label:'Temperatura °C',
+            data:temperaturas,
+            borderColor:'red',
+            backgroundColor:'rgba(255,0,0,0.2)',
+            fill:true
+        }]
+    },
+    options:{
+        responsive:true
+    }
+}
+);
 
-<div class="valor gas">
-🧪 Gas: ${d.gas}
-</div>
-
-</div>
-
-`;
-
-});
-
-html += `
-
-</div>
+</script>
 
 </body>
-
 </html>
 
 `;
-
-res.send(html);
-
-});
 
 // Endpoint para recibir datos del ESP32
 app.post("/api/data", (req, res) => {
